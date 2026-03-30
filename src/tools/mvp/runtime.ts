@@ -50,7 +50,7 @@ export type ToolInputDef = {
   max?: number;
   unit?: string;
   rows?: number;
-  options?: Array<{ value: string; label: string }>;
+  options?: ReadonlyArray<{ value: string; label: string }>;
   helpText?: string;
 };
 
@@ -59,7 +59,7 @@ export type ToolRuntimeSpec = {
   name: string;
   summary: string;
   disclaimer?: string;
-  inputs: ToolInputDef[];
+  inputs: ReadonlyArray<ToolInputDef>;
   validate: (raw: Record<string, string>) => string[];
   compute: (raw: Record<string, string>) => ToolComputeResult;
   sampleValid: Record<string, string>;

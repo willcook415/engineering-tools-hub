@@ -18,6 +18,7 @@ import type {
   MovingLoadTemplate,
   PointLoad,
   PointMoment,
+  SectionDefinition,
   StiffnessSegment,
   SupportStation,
   UDL,
@@ -705,7 +706,7 @@ export default function BeamBendingTool() {
       return;
     }
     const sectionUnit = inputs.section?.unit ?? "mm";
-    const nextSection = {
+    const nextSection: SectionDefinition = {
       id: sectionId as NonNullable<BeamBendingInputs["section"]>["id"],
       unit: sectionUnit,
       dims: defaultSectionDims(
@@ -4612,7 +4613,7 @@ function mergeLoadCategories(
     });
   }
 
-  const builtInOrder = new Map(CASE_CATEGORY_OPTIONS.map((id, idx) => [id, idx]));
+  const builtInOrder = new Map<string, number>(CASE_CATEGORY_OPTIONS.map((id, idx) => [id, idx]));
   return Array.from(byId.values()).sort((a, b) => {
     const ai = builtInOrder.has(a.id) ? (builtInOrder.get(a.id) ?? 0) : 999;
     const bi = builtInOrder.has(b.id) ? (builtInOrder.get(b.id) ?? 0) : 999;
@@ -4624,8 +4625,8 @@ function mergeLoadCategories(
 function defaultSectionDims(
   sectionId: NonNullable<BeamBendingInputs["section"]>["id"],
   unit: "m" | "mm"
-) {
-  const dimsInMeters =
+): Record<string, number> {
+  const dimsInMeters: Record<string, number> =
     sectionId === "rectangular"
       ? { b: 0.3, h: 0.6 }
       : sectionId === "circular_solid"
@@ -4638,7 +4639,7 @@ function defaultSectionDims(
   if (unit === "m") return dimsInMeters;
   return Object.fromEntries(
     Object.entries(dimsInMeters).map(([key, value]) => [key, value * 1000])
-  );
+  ) as Record<string, number>;
 }
 
 function resolveSupportStationsForView(inputs: BeamBendingInputs): SupportStation[] {

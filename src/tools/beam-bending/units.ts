@@ -15,12 +15,9 @@ export type UnitQuantity =
   | "springRotational"
   | "deflection";
 
-const UNIT_FACTOR_FROM_BASE: Record<
-  BeamDisplayUnits[keyof BeamDisplayUnits] & string,
-  number
-> = {
-  si_base: 1,
-  engineering_metric: 1,
+type UnitSymbol = Exclude<BeamDisplayUnits[keyof BeamDisplayUnits], DisplayUnitSystem>;
+
+const UNIT_FACTOR_FROM_BASE: Record<UnitSymbol, number> = {
   N: 1,
   kN: 1e-3,
   m: 1,
@@ -101,6 +98,19 @@ const ENUM_OPTIONS: {
   deflection: ["m", "mm"],
 };
 
+const DISPLAY_UNIT_KEYS = Object.keys(ENUM_OPTIONS) as Array<keyof BeamDisplayUnits>;
+
+function ensureValidDisplayUnit<K extends keyof BeamDisplayUnits>(
+  merged: BeamDisplayUnits,
+  fallback: BeamDisplayUnits,
+  key: K
+) {
+  const options = ENUM_OPTIONS[key] as readonly BeamDisplayUnits[K][];
+  if (!options.includes(merged[key])) {
+    merged[key] = fallback[key];
+  }
+}
+
 function normalizeSymbol(s: string) {
   return s.replace(/\s+/g, "").replaceAll("*", "·").replaceAll("μ", "µ").toLowerCase();
 }
@@ -137,11 +147,8 @@ export function getDisplayUnits(input?: Partial<BeamDisplayUnits> | undefined): 
     ...fallback,
     ...(input ?? {}),
   };
-  for (const key of Object.keys(ENUM_OPTIONS) as Array<keyof BeamDisplayUnits>) {
-    const options = ENUM_OPTIONS[key];
-    if (!(options as readonly string[]).includes(String(merged[key]))) {
-      merged[key] = fallback[key];
-    }
+  for (const key of DISPLAY_UNIT_KEYS) {
+    ensureValidDisplayUnit(merged, fallback, key);
   }
   return merged;
 }
@@ -164,7 +171,7 @@ export function getDisplayUnitsIssues(display?: Partial<BeamDisplayUnits>): stri
   return issues;
 }
 
-export function quantityUnitSymbol(units: BeamDisplayUnits, quantity: UnitQuantity): string {
+export function quantityUnitSymbol(units: BeamDisplayUnits, quantity: UnitQuantity): UnitSymbol {
   if (quantity === "force") return units.force;
   if (quantity === "length") return units.length;
   if (quantity === "moment") return units.moment;

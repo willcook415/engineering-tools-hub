@@ -8,7 +8,7 @@ function cloneInputState(defaults: Record<string, string>) {
   return { ...defaults };
 }
 
-function buildDefaultState(inputs: Array<{ key: string; defaultValue: string }>) {
+function buildDefaultState(inputs: ReadonlyArray<{ key: string; defaultValue: string }>) {
   const state: Record<string, string> = {};
   for (const field of inputs) state[field.key] = field.defaultValue;
   return state;
