@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import Panel from "../../../components/Panel";
+import type { ToolRuntimeSpec } from "../runtime";
 import { getToolRuntimeSpec } from "../specs";
 
 function cloneInputState(defaults: Record<string, string>) {
@@ -15,21 +16,6 @@ function buildDefaultState(inputs: Array<{ key: string; defaultValue: string }>)
 
 export default function MvpToolPage({ slug }: { slug: string }) {
   const spec = useMemo(() => getToolRuntimeSpec(slug), [slug]);
-  const [raw, setRaw] = useState<Record<string, string>>(() => {
-    if (!spec) return {};
-    return buildDefaultState(spec.inputs);
-  });
-  const [statusMsg, setStatusMsg] = useState("");
-
-  useEffect(() => {
-    if (!spec) {
-      setRaw({});
-      setStatusMsg("");
-      return;
-    }
-    setRaw(cloneInputState(buildDefaultState(spec.inputs)));
-    setStatusMsg("");
-  }, [spec?.slug]);
 
   if (!spec) {
     return (
@@ -41,6 +27,13 @@ export default function MvpToolPage({ slug }: { slug: string }) {
       </div>
     );
   }
+
+  return <MvpRuntimePage key={spec.slug} spec={spec} />;
+}
+
+function MvpRuntimePage({ spec }: { spec: ToolRuntimeSpec }) {
+  const [raw, setRaw] = useState<Record<string, string>>(() => cloneInputState(buildDefaultState(spec.inputs)));
+  const [statusMsg, setStatusMsg] = useState("");
 
   const issues = spec.validate(raw);
   const result = issues.length === 0 ? spec.compute(raw) : null;

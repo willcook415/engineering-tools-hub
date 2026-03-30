@@ -1,73 +1,130 @@
-# React + TypeScript + Vite
+# Engineering Tools Hub
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Engineering Tools Hub is a React + TypeScript web app for fast engineering calculations, checks, and visual workflows.
 
-Currently, two official plugins are available:
+It currently ships with **36 tools across 8 categories**:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Solid Mechanics: 6
+- Fluids: 5
+- Thermodynamics: 5
+- Materials: 4
+- Maths: 5
+- Electrical: 3
+- Civil: 3
+- Utilities: 5
 
-## React Compiler
+## Highlights
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Unified tool catalog with search and category grouping.
+- Two execution models:
+  - **Rich tools** for custom high-interaction workflows.
+  - **MVP runtime tools** generated from shared runtime specs.
+- Export and reporting support (including PDF flows in Beam Bending).
+- Built-in lint, type-check, and unit-test quality gates in CI.
 
-## Expanding the ESLint configuration
+Current rich tools:
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- Beam Bending
+- Polynomial Solver
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Tech Stack
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- React 19
+- TypeScript 5
+- Vite 8
+- React Router 7
+- Recharts
+- KaTeX (`react-katex`)
+- `jsPDF` + `html2canvas`
+- ESLint + Vitest
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Getting Started
+
+### Prerequisites
+
+- Node.js 22.x (matches CI)
+- npm 10+
+
+### Install
+
+```bash
+npm ci
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Run Dev Server
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run dev
 ```
+
+### Build
+
+```bash
+npm run build
+```
+
+## Scripts
+
+- `npm run dev`: start local dev server
+- `npm run build`: type-check and build for production
+- `npm run preview`: preview production build locally
+- `npm run lint`: run ESLint
+- `npm test`: run Vitest once
+- `npm run test:watch`: run Vitest in watch mode
+
+## CI Quality Gates
+
+GitHub Actions (`.github/workflows/ci.yml`) runs on push and pull request:
+
+1. `npm ci`
+2. `npm run lint`
+3. `npx tsc --noEmit -p tsconfig.app.json`
+4. `npm test`
+
+## Project Structure
+
+```text
+src/
+  app/                     # App shell, routes, layout
+  pages/                   # Home and dynamic tool page
+  components/              # Shared UI primitives
+  features/                # Cross-tool features (pdf, plotting)
+  tools/
+    _registry/             # Tool metadata + resolver
+    beam-bending/          # Rich tool implementation
+    polynomial-solver/     # Rich tool implementation
+    mvp/                   # Runtime-driven tool specs and engine
+```
+
+Key files:
+
+- `src/tools/_registry/tools.ts`: tool catalog metadata
+- `src/tools/_registry/resolver.tsx`: maps tool metadata to rendered tool view
+- `src/tools/mvp/specs.ts`: MVP runtime tool definitions and compute logic
+
+## Adding a Tool
+
+### Add an MVP Runtime Tool
+
+1. Add metadata in `src/tools/_registry/tools.ts` (`RAW_TOOLS`).
+2. Add a runtime spec in `src/tools/mvp/specs.ts`.
+3. Ensure the slug is covered by the expected spec list there.
+4. Add tests for validation/compute logic where appropriate.
+
+### Add a Rich Tool
+
+1. Create a dedicated tool folder under `src/tools/<your-tool>/`.
+2. Add metadata in `src/tools/_registry/tools.ts`.
+3. Register a renderer in `src/tools/_registry/resolver.tsx`.
+4. Mark the tool as `rich` in the registry engine-type mapping logic.
+5. Add targeted unit tests and UI-level checks.
+
+## Beam Bending Documentation
+
+- `docs/beam-bending-quickstart.md`
+- `docs/beam-bending-qa-checklist.md`
+- `docs/beam-bending-release-notes.md`
+
+## Disclaimer
+
+These calculators are intended for engineering workflow support, learning, and preliminary checks. They are **not** a substitute for independent engineering judgment, code compliance review, or formal design sign-off.

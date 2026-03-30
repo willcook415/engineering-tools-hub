@@ -317,7 +317,7 @@ export default function BeamView({
     const span = hi - lo;
     const center = 0.5 * (lo + hi);
     const snapResult = snapWithAnchors(rawX, step, snapAnchors);
-    let dx = snapResult.x - center;
+    const dx = snapResult.x - center;
     let x1 = lo + dx;
     let x2 = hi + dx;
 

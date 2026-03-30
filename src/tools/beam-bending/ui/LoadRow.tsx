@@ -605,6 +605,7 @@ function NumberInput({
   const [text, setText] = useState<string>(() => formatForInput(safeValue, step));
   const [isInvalid, setIsInvalid] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
+  const displayText = isFocused ? text : formatForInput(safeValue, step);
 
   function clearHold() {
     if (holdStartRef.current !== null) {
@@ -616,12 +617,6 @@ function NumberInput({
       holdTickRef.current = null;
     }
   }
-
-  useEffect(() => {
-    if (isFocused) return;
-    setText(formatForInput(safeValue, step));
-    setIsInvalid(false);
-  }, [safeValue, step, unitLabel, isFocused]);
 
   useEffect(() => {
     return () => clearHold();
@@ -662,7 +657,7 @@ function NumberInput({
       <input
         className={isInvalid ? "input invalidInput" : "input"}
         type="text"
-        value={text}
+        value={displayText}
         inputMode="decimal"
         disabled={disabled}
         onChange={(e) => {
@@ -699,6 +694,8 @@ function NumberInput({
         }}
         onFocus={(e) => {
           e.stopPropagation();
+          setText(formatForInput(safeValue, step));
+          setIsInvalid(false);
           setIsFocused(true);
         }}
         onKeyDown={(e) => {
@@ -788,6 +785,6 @@ function NumberInput({
   );
 }
 
-export function formatSimpleNumber(v: number) {
+function formatSimpleNumber(v: number) {
   return formatEngineeringNumber(v, 4);
 }

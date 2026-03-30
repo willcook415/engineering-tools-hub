@@ -1413,9 +1413,12 @@ export default function BeamBendingTool() {
   const displayUnits = useMemo(() => getDisplayUnits(inputs.displayUnits), [inputs.displayUnits]);
   const supportStations = useMemo(() => resolveSupportStationsForView(inputs), [inputs]);
   const hasCustomSupportStations = (inputs.supportLayout?.stations ?? []).some((station) => station.active !== false);
-  const stiffnessSegments = inputs.stiffnessSegments ?? [];
-  const internalReleases = (inputs.internalReleases ?? []).filter((release) => release.active !== false);
-  const movingLoadTemplates = inputs.movingLoadTemplates ?? [];
+  const stiffnessSegments = useMemo(() => inputs.stiffnessSegments ?? [], [inputs.stiffnessSegments]);
+  const internalReleases = useMemo(
+    () => (inputs.internalReleases ?? []).filter((release) => release.active !== false),
+    [inputs.internalReleases]
+  );
+  const movingLoadTemplates = useMemo(() => inputs.movingLoadTemplates ?? [], [inputs.movingLoadTemplates]);
   const supportChartMarkers = useMemo(
     () =>
       supportStations
@@ -1496,9 +1499,9 @@ export default function BeamBendingTool() {
   const canGenerateSelfWeight = typeof selfWeightEstimate === "number" && Number.isFinite(selfWeightEstimate) && selfWeightEstimate > 0;
   const visibleLoadCount = inputs.loads.filter((l) => !l.hidden).length;
   const hiddenLoadCount = inputs.loads.length - visibleLoadCount;
-  const loadCases = inputs.loadCases ?? [];
-  const loadCombinations = inputs.loadCombinations ?? [];
-  const envelopeDefinitions = inputs.envelopeDefinitions ?? [];
+  const loadCases = useMemo(() => inputs.loadCases ?? [], [inputs.loadCases]);
+  const loadCombinations = useMemo(() => inputs.loadCombinations ?? [], [inputs.loadCombinations]);
+  const envelopeDefinitions = useMemo(() => inputs.envelopeDefinitions ?? [], [inputs.envelopeDefinitions]);
   const loadCategories = useMemo(
     () => mergeLoadCategories(inputs.loadCategories, loadCases, inputs.loads),
     [inputs.loadCategories, loadCases, inputs.loads]
